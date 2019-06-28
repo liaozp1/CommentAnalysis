@@ -13,8 +13,8 @@ class Keywords():
     基于词频
     """
     def __init__(self,sentense):
-        jieba.load_userdict(r'data\vocab.txt')
-        stopfile = open(r'data\stopwords.txt', 'r', encoding='utf-8')
+        jieba.load_userdict(r'..\data\vocab.txt')
+        stopfile = open(r'..\data\stopwords.txt', 'r', encoding='utf-8')
         stopwords_lst = stopfile.readlines()
         STOPWORDS = [x.strip() for x in stopwords_lst]
         STOPWORDS += [' ', '','\n']
@@ -38,6 +38,7 @@ class Keywords():
         word_list=self.cut_all()
         result = dict(Counter(word_list))
         sortlist = sorted(result.items(), key=lambda item: item[1], reverse=True)
+        # sortlist1 = [word for word in sortlist if len(word[0])!=1] ##过滤掉一个字的词语
         top_dict = {}
         try:
             for i in range(0, top):
@@ -47,22 +48,24 @@ class Keywords():
         print(top_dict)
         return top_dict
 
-    def wordCloud(self, title):
-        top_dict=self.topWord()
+    def wordCloud(self, title,savepath,top):
+        top_dict=self.topWord(top)
         wc = WordCloud(font_path="msyh.ttc",
                        background_color='white',
-                       max_words=100,
+                       max_words=top,
                        stopwords=self.stopwords,
                        max_font_size=80,
                        random_state=42,
                        margin=3)  # 配置词云参数
         wc.generate_from_frequencies(top_dict)  # 生成词云
+        plt.rcParams['font.sans-serif'] = ['SimHei']
         plt.imshow(wc, interpolation="bilinear")  # 作图
         plt.axis("off")  # 不显示坐标轴
         plt.xticks([])
         plt.yticks([])
         plt.title(title)
-        plt.show()
+        # plt.show()
+        plt.savefig(savepath)
 
 
 class KeywordsTfidf(Keywords):
@@ -71,7 +74,7 @@ class KeywordsTfidf(Keywords):
     """
     def __init__(self,sentense):
         Keywords.__init__(self, sentense)
-        jieba.analyse.set_stop_words(r"data\stopwords.txt")
+        jieba.analyse.set_stop_words(r"..\data\stopwords.txt")
 
     def topWord(self, top=100):
         top_dict = {}
@@ -88,7 +91,7 @@ class KeywordsTextrank(Keywords):
     """
     def __init__(self,sentense):
         Keywords.__init__(self, sentense)
-        jieba.analyse.set_stop_words(r"data\stopwords.txt")
+        jieba.analyse.set_stop_words(r"..\data\stopwords.txt")
 
     def topWord(self, top=100):
         top_dict = {}
